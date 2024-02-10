@@ -89,8 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Load failed, Try Again!")));
-      _inProgress = false;
-      setState(() {});
     }
     _inProgress = false;
     setState(() {});
