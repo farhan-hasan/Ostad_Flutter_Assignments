@@ -15,7 +15,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   List<Product> productList = [];
   bool _inProgress = false;
 
@@ -41,9 +40,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView.builder(
               //itemCount: 5,
               itemBuilder: (context, index) {
-                //return _getStaticProductListTile();
-                return _getProductListTile(productList[index]);
-              }),
+            //return _getStaticProductListTile();
+            return _getProductListTile(productList[index]);
+          }),
         ),
       ),
     );
@@ -52,18 +51,21 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _getProductListTile(Product product) {
     return InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => PhotoDetailsScreen(product: product,)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PhotoDetailsScreen(
+                      product: product,
+                    )));
       },
       child: ListTile(
         leading: SizedBox(
           child: Image.network(product.thumbnailUrl ?? ''),
         ),
-        title:  Wrap(children: [Text(product.title ?? 'Unknown')]),
-
+        title: Wrap(children: [Text(product.title ?? 'Unknown')]),
       ),
     );
   }
-
 
   Future<void> getProductListFromAPI() async {
     _inProgress = true;
@@ -75,29 +77,20 @@ class _HomeScreenState extends State<HomeScreen> {
     /// step 2: Call API
     Response response = await get(uri);
 
-    print(response.body.runtimeType);
-
     /// step 3: Show response
     if (response.statusCode == 200) {
       productList.clear();
       var decodedResponse = jsonDecode(response.body);
 
-      //List<Map<String, dynamic>> list = json.decode(response.body);
-
-
-      if(response.statusCode==200) {
-        for (var item in decodedResponse) {
-          Product product = Product.fromJson(item);
-          productList.add(product);
-        }
+      for (var item in decodedResponse) {
+        Product product = Product.fromJson(item);
+        productList.add(product);
       }
-      else {
-        showDialog(context: context, builder: (context) {
-          return const AlertDialog(
-            content: Text("Loading Failed"),
-          );
-        });
-      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Load failed, Try Again!")));
+      _inProgress = false;
+      setState(() {});
     }
     _inProgress = false;
     setState(() {});
